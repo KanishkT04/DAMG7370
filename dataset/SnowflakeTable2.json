@@ -9,8 +9,8 @@
 		"type": "SnowflakeV2Table",
 		"schema": [],
 		"typeProperties": {
-			"schema": "STAGE",
-			"table": "NYPD_arrest_data"
+			"schema": "TEMP_SCHEMA",
+			"table": "arrest_data"
 		}
 	}
 }
