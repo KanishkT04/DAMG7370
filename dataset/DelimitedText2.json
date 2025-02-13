@@ -2,16 +2,16 @@
 	"name": "DelimitedText2",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureBlobStorage",
+			"referenceName": "AzureBlobStorage2",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
+				"type": "AzureBlobStorageLocation",
 				"fileName": "NYPD Arrest Data Data Profiling Output.csv",
-				"fileSystem": "bronze"
+				"container": "bronze"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
