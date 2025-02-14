@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "damg7370adfspring25"
+		},
+		"Snowflake3_connectionString": {
+			"value": ""
+		},
+		"snowflake_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage_sasUri": {
+			"value": ""
+		},
+		"AzureBlobStorage1_sasUri": {
+			"value": ""
+		},
+		"AzureBlobStorage2_sasUri": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1LS_properties_typeProperties_url": {
+			"value": "https://damg73702025.dfs.core.windows.net/"
+		},
+		"AzureKeyVaultLS_properties_typeProperties_baseUrl": {
+			"value": "https://damg7370spring2025kan.vault.azure.net/"
+		},
+		"Snowflake3_properties_typeProperties_database": {
+			"value": "TEMP_DB"
+		},
+		"snowflake_properties_typeProperties_database": {
+			"value": "TEMP_DB"
+		}
+	}
+}
