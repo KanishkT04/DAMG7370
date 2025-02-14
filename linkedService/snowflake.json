@@ -1,12 +1,10 @@
 {
 	"name": "snowflake",
 	"properties": {
-		"type": "Snowflake",
+		"type": "SnowflakeV2",
 		"typeProperties": {
-			"connectionString": "jdbc:snowflake://yza01031.east-us-2.snowflakecomputing.com/?user=TEMP_USER&password=your_password&validateDefaultParameters=false",
+			"connectionString": "jdbc:snowflake://yza01031.east-us-2.snowflakecomputing.com/?user=TEMP_USER&password=your_password&insecureMode=true",
 			"account": "yza01031.east-us-2",
-			"database": "TEMP_DB",
-			"warehouse": "TEMP_WH",
 			"authType": "Basic"
 		},
 		"annotations": []
