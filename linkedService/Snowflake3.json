@@ -4,5 +4,8 @@
 		"type": "SnowflakeV2",
 		"annotations": []
 	},
-	"connectionString": "jdbc:snowflake://yza01031.east-us-2.azure.snowflakecomputing.com/?role=TEMP_ROLE&warehouse=TEMP_WH&db=TEMP_DB&schema=TEMP_SCHEMA"
+	"typeProperties": {
+		"accountIdentifier": "yza01031.east-us-2.azure",
+		"connectionString": "jdbc:snowflake://yza01031.east-us-2.azure.snowflakecomputing.com"
+	}
 }
