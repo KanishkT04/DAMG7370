@@ -3,7 +3,7 @@
 	"properties": {
 		"type": "Snowflake",
 		"typeProperties": {
-			"connectionString": "jdbc:snowflake://yza01031.east-us-2.snowflakecomputing.com/?user=TEMP_USER&password=your_password&insecureMode=true",
+			"connectionString": "jdbc:snowflake://yza01031.east-us-2.snowflakecomputing.com/?user=TEMP_USER&password=your_password&validateDefaultParameters=false",
 			"account": "yza01031.east-us-2",
 			"database": "TEMP_DB",
 			"warehouse": "TEMP_WH",
