@@ -1,9 +1,8 @@
 {
 	"name": "Snowflake4",
 	"properties": {
-		"type": "Snowflake",
+		"type": "SnowflakeV2",
 		"typeProperties": {
-			"accountIdentifier": "yza01031.east-us-2.azure",
 			"user": "TEMP_USER",
 			"warehouse": "TEMP_WH",
 			"database": "TEMP_DB",
