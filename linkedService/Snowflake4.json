@@ -1,0 +1,14 @@
+{
+	"name": "Snowflake4",
+	"properties": {
+		"type": "SnowflakeV2",
+		"typeProperties": {
+			"user": "TEMP_USER",
+			"warehouse": "TEMP_WH",
+			"database": "TEMP_DB",
+			"schema": "TEMP_SCHEMA"
+		},
+		"annotations": []
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}
