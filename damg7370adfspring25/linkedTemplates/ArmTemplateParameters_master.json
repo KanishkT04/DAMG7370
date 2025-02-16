@@ -8,6 +8,9 @@
 		"Snowflake3_connectionString": {
 			"value": ""
 		},
+		"Snowflake4_password": {
+			"value": ""
+		},
 		"snowflake_connectionString": {
 			"value": ""
 		},
@@ -28,6 +31,12 @@
 		},
 		"Snowflake3_properties_typeProperties_database": {
 			"value": "TEMP_DB"
+		},
+		"Snowflake4_properties_typeProperties_database": {
+			"value": "TEMP_DB"
+		},
+		"Snowflake4_properties_typeProperties_role": {
+			"value": "TEMP_ROLE"
 		},
 		"snowflake_properties_typeProperties_database": {
 			"value": "TEMP_DB"

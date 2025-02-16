@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Snowflake3'"
 		},
+		"Snowflake4_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Snowflake4'"
+		},
 		"snowflake_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'snowflake'"
@@ -38,6 +42,14 @@
 		"Snowflake3_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "TEMP_DB"
+		},
+		"Snowflake4_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "TEMP_DB"
+		},
+		"Snowflake4_properties_typeProperties_role": {
+			"type": "string",
+			"defaultValue": "TEMP_ROLE"
 		},
 		"snowflake_properties_typeProperties_database": {
 			"type": "string",
@@ -73,6 +85,9 @@
 					"Snowflake3_connectionString": {
 						"value": "[parameters('Snowflake3_connectionString')]"
 					},
+					"Snowflake4_password": {
+						"value": "[parameters('Snowflake4_password')]"
+					},
 					"snowflake_connectionString": {
 						"value": "[parameters('snowflake_connectionString')]"
 					},
@@ -94,12 +109,38 @@
 					"Snowflake3_properties_typeProperties_database": {
 						"value": "[parameters('Snowflake3_properties_typeProperties_database')]"
 					},
+					"Snowflake4_properties_typeProperties_database": {
+						"value": "[parameters('Snowflake4_properties_typeProperties_database')]"
+					},
+					"Snowflake4_properties_typeProperties_role": {
+						"value": "[parameters('Snowflake4_properties_typeProperties_role')]"
+					},
 					"snowflake_properties_typeProperties_database": {
 						"value": "[parameters('snowflake_properties_typeProperties_database')]"
 					}
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "damg7370adfspring25_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'damg7370adfspring25_ArmTemplate_0')]"
+			]
 		}
 	]
 }
