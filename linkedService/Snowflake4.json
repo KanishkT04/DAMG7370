@@ -2,17 +2,16 @@
 	"name": "Snowflake4",
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
-		"annotations": [],
-		"type": "SnowflakeV2",
+		"type": "Snowflake",
 		"typeProperties": {
-			"authenticationType": "Basic",
+			"connectionString": "jdbc:snowflake://yza01031.east-us-2.azure.snowflakecomputing.com/?user=TEMP_USER&password=your_password&warehouse=TEMP_WH&db=TEMP_DB&schema=TEMP_SCHEMA",
 			"accountIdentifier": "yza01031.east-us-2.azure",
 			"user": "TEMP_USER",
-			"database": "TEMP_DB",
 			"warehouse": "TEMP_WH",
-			"role": "TEMP_ROLE",
+			"database": "TEMP_DB",
 			"schema": "TEMP_SCHEMA",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQEU5QzlGNjQ5LTYxMzItNERGOS04ODlELUZBMkM2NDY1MTY1Ql8yMDZmZTgxYS1jMGQzLTRhYTYtYTIxOS0yNzBmYWI0NGY3YzIiDQp9"
-		}
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQEU5QzlGNjQ5LTYxMzItNERGOS04ODlELUZBMkM2NDY1MTY1Ql8yNDk1ZDlmMy0yMGJlLTRmNjctYjkyZC0yNjE2OGYzM2E4YmMiDQp9"
+		},
+		"annotations": []
 	}
 }
