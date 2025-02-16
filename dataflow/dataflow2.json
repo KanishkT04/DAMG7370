@@ -12,7 +12,15 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable3",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSF"
+				}
+			],
 			"transformations": [
 				{
 					"name": "TranposeColumns"
@@ -43,22 +51,27 @@
 				",",
 				"          Load_Dt = currentDate()) ~> TranposeColumns",
 				"TranposeColumns select(mapColumn(",
-				"          {License Issue Date},",
-				"          {License Number},",
-				"          {Animal's Name},",
-				"          Species,",
-				"          {Primary Breed},",
-				"          {Secondary Breed},",
-				"          {ZIP Code},",
 				"          LIC_ISSUE_DATE,",
-				"          Secondary_Breed,",
-				"          ZIP_Code,",
 				"          License_Number,",
 				"          Animal_Name,",
+				"          Species,",
+				"          {Primary Breed},",
+				"          Secondary_Breed,",
+				"          ZIP_Code,",
 				"          Load_Dt",
 				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> PickRequiredColumns",
+				"PickRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> PickRequiredColumns"
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true) ~> sinkSF"
 			]
 		}
 	}
