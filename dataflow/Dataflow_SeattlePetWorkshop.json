@@ -1,5 +1,5 @@
 {
-	"name": "dataflow2",
+	"name": "Dataflow_SeattlePetWorkshop",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "SnowflakeTable3",
+						"referenceName": "SnowflakeTable4",
 						"type": "DatasetReference"
 					},
 					"name": "sinkSF"
@@ -51,14 +51,14 @@
 				",",
 				"          Load_Dt = currentDate()) ~> TranposeColumns",
 				"TranposeColumns select(mapColumn(",
-				"          LIC_ISSUE_DATE,",
-				"          License_Number,",
-				"          Animal_Name,",
-				"          Species,",
-				"          {Primary Breed},",
-				"          Secondary_Breed,",
-				"          ZIP_Code,",
-				"          Load_Dt",
+				"          LICENSE_ISSUE_DATE = LIC_ISSUE_DATE,",
+				"          LICENSE_NUMBER = License_Number,",
+				"          ANIMAL_NAME = Animal_Name,",
+				"          SPECIES = Species,",
+				"          PRIMARY_BREED = {Primary Breed},",
+				"          SECONDARY_BREED = Secondary_Breed,",
+				"          ZIP_CODE = ZIP_Code,",
+				"          LOAD_DT = Load_Dt",
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> PickRequiredColumns",

@@ -1,9 +1,9 @@
 {
-	"name": "IndividualProject_CSV_2_Parquet",
+	"name": "pipeline2",
 	"properties": {
 		"activities": [
 			{
-				"name": "dataflow1",
+				"name": "Data flow1",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DataFlow_IndividualPart1",
+						"referenceName": "Dataflow_SeattlePetWorkshop",
 						"type": "DataFlowReference"
 					},
 					"compute": {
