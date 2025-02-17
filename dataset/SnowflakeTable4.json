@@ -10,7 +10,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "TEMP_SCHEMA",
-			"table": "DS_V2_PET_LICENSE_STAGE_SNOWFLAKE"
+			"table": "BREED_DIM"
 		}
 	}
 }
