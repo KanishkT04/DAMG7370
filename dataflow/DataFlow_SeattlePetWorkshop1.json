@@ -46,7 +46,10 @@
 					"name": "window1"
 				},
 				{
-					"name": "join1"
+					"name": "SourceDataWithSK"
+				},
+				{
+					"name": "aggregateBreedKeys"
 				}
 			],
 			"scriptLines": [
@@ -98,7 +101,12 @@
 				"     joinType:'cross',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
+				"     broadcast: 'auto')~> SourceDataWithSK",
+				"SourceDataWithSK aggregate(groupBy(SPECIES,",
+				"          PRIMARY_BREED,",
+				"          SECONDARY_BREED,",
+				"          MAXBREEDSK),",
+				"     COUNT_ROW = count(LICENSE_NUMBER)) ~> aggregateBreedKeys",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
