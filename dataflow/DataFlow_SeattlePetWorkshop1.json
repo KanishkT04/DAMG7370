@@ -34,6 +34,9 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "window1"
 				}
 			],
 			"scriptLines": [
@@ -62,8 +65,9 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> BreedDimSource",
-				"BreedDimSource derive(DI_CREATED_DT = currentDate()) ~> derivedColumn1",
+				"window1 derive(DI_CREATED_DT = currentDate()) ~> derivedColumn1",
 				"derivedColumn1 select(mapColumn(",
+				"          BREED_SK,",
 				"          PRIMARY_BREED_NAME = {Primary Breed},",
 				"          SECONDARY_BREED_NAME = {Secondary Breed},",
 				"          SPECIES_NAME = Species,",
@@ -71,6 +75,8 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
+				"BreedDimSource window(asc({Primary Breed}, true),",
+				"     BREED_SK = rowNumber()) ~> window1",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
