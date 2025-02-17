@@ -6,6 +6,13 @@
 			"sources": [
 				{
 					"dataset": {
+						"referenceName": "DelimitedText_DataSet",
+						"type": "DatasetReference"
+					},
+					"name": "BreedDimSource"
+				},
+				{
+					"dataset": {
 						"referenceName": "SnowflakeTable4",
 						"type": "DatasetReference"
 					},
@@ -13,10 +20,10 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "DelimitedText_DataSet",
+						"referenceName": "SnowflakeTable4",
 						"type": "DatasetReference"
 					},
-					"name": "BreedDimSource"
+					"name": "BreedDimMaxID"
 				}
 			],
 			"sinks": [
@@ -37,9 +44,24 @@
 				},
 				{
 					"name": "window1"
+				},
+				{
+					"name": "join1"
 				}
 			],
 			"scriptLines": [
+				"source(output(",
+				"          {License Issue Date} as string,",
+				"          {License Number} as string,",
+				"          {Animal's Name} as string,",
+				"          Species as string,",
+				"          {Primary Breed} as string,",
+				"          {Secondary Breed} as string,",
+				"          {ZIP Code} as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> BreedDimSource",
 				"source(output(",
 				"          LICENSE_ISSUE_DATE as date,",
 				"          LICENSE_NUMBER as string,",
@@ -53,18 +75,10 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'table') ~> sourceStg",
-				"source(output(",
-				"          {License Issue Date} as string,",
-				"          {License Number} as string,",
-				"          {Animal's Name} as string,",
-				"          Species as string,",
-				"          {Primary Breed} as string,",
-				"          {Secondary Breed} as string,",
-				"          {ZIP Code} as integer",
-				"     ),",
-				"     allowSchemaDrift: true,",
+				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> BreedDimSource",
+				"     query: 'SELECT NVL(MAX(BREED_SK),0) as MaxBreedSK FROM TEMP_SCHEMA.BREED_DIM',",
+				"     format: 'query') ~> BreedDimMaxID",
 				"window1 derive(DI_CREATED_DT = currentDate()) ~> derivedColumn1",
 				"derivedColumn1 select(mapColumn(",
 				"          BREED_SK,",
@@ -77,6 +91,11 @@
 				"     skipDuplicateMapOutputs: true) ~> select1",
 				"BreedDimSource window(asc({Primary Breed}, true),",
 				"     BREED_SK = rowNumber()) ~> window1",
+				"sourceStg, BreedDimMaxID join(1==1,",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",

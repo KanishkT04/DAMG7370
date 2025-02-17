@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "Dataflow_SeattlePetWorkshop",
+						"referenceName": "DataFlow_IndividualPart1",
 						"type": "DataFlowReference"
 					},
 					"compute": {
