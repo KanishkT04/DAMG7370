@@ -13,6 +13,274 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DataFlow_LocationDim')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DelimitedText4",
+								"type": "DatasetReference"
+							},
+							"name": "sourceGeoFile"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "SinkLocationDim"
+						}
+					],
+					"transformations": [
+						{
+							"name": "surrogateKey1"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          state_fips as short,",
+						"          state as string,",
+						"          state_abbr as string,",
+						"          zipcode as string,",
+						"          county as string,",
+						"          city as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceGeoFile",
+						"sourceGeoFile keyGenerate(output(SK_ID as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> surrogateKey1",
+						"surrogateKey1 derive(DI_CREATED_DT = currentTimestamp()) ~> derivedColumn1",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     truncate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     stageInsert: true,",
+						"     mapColumn(",
+						"          STATE_FIPS = state_fips,",
+						"          STATE = state,",
+						"          STATE_ABBR = state_abbr,",
+						"          ZIPCODE = zipcode,",
+						"          COUNTY = county,",
+						"          CITY = city,",
+						"          SK_ID,",
+						"          DI_CREATED_DT",
+						"     )) ~> SinkLocationDim"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlow_SeattlePetWorkshop1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DelimitedText_DataSet",
+								"type": "DatasetReference"
+							},
+							"name": "BreedDimSource"
+						},
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "sourceStg"
+						},
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "BreedDimMaxID"
+						},
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "sourceBreedDimActual"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "sourceBreedDim"
+						},
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "window1"
+						},
+						{
+							"name": "SourceDataWithSK"
+						},
+						{
+							"name": "aggregateBreedKeys"
+						},
+						{
+							"name": "joinToTarget"
+						},
+						{
+							"name": "filterExistingRows"
+						},
+						{
+							"name": "surrogateKey1"
+						},
+						{
+							"name": "derivedColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {License Issue Date} as string,",
+						"          {License Number} as string,",
+						"          {Animal's Name} as string,",
+						"          Species as string,",
+						"          {Primary Breed} as string,",
+						"          {Secondary Breed} as string,",
+						"          {ZIP Code} as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> BreedDimSource",
+						"source(output(",
+						"          LICENSE_ISSUE_DATE as date,",
+						"          LICENSE_NUMBER as string,",
+						"          ANIMAL_NAME as string,",
+						"          SPECIES as string,",
+						"          PRIMARY_BREED as string,",
+						"          SECONDARY_BREED as string,",
+						"          ZIP_CODE as decimal(38,0),",
+						"          LOAD_DT as date",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'table') ~> sourceStg",
+						"source(output(",
+						"          MAXBREEDSK as decimal(10,0)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     query: 'SELECT NVL(MAX(BREED_SK),0) as MaxBreedSK FROM TEMP_SCHEMA.BREED_DIM',",
+						"     format: 'query') ~> BreedDimMaxID",
+						"source(output(",
+						"          BREED_SK as decimal(10,0),",
+						"          SPECIES_NAME as string,",
+						"          PRIMARY_BREED_NAME as string,",
+						"          SECONDARY_BREED_NAME as string,",
+						"          DI_LOAD_DT as date",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'table') ~> sourceBreedDimActual",
+						"window1 derive(DI_CREATED_DT = currentDate()) ~> derivedColumn1",
+						"derivedColumn1 select(mapColumn(",
+						"          BREED_SK,",
+						"          PRIMARY_BREED_NAME = {Primary Breed},",
+						"          SECONDARY_BREED_NAME = {Secondary Breed},",
+						"          SPECIES_NAME = Species,",
+						"          DI_LOAD_DT = DI_CREATED_DT",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"BreedDimSource window(asc({Primary Breed}, true),",
+						"     BREED_SK = rowNumber()) ~> window1",
+						"sourceStg, BreedDimMaxID join(1==1,",
+						"     joinType:'cross',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> SourceDataWithSK",
+						"SourceDataWithSK aggregate(groupBy(SPECIES,",
+						"          PRIMARY_BREED,",
+						"          SECONDARY_BREED,",
+						"          MAXBREEDSK),",
+						"     COUNT_ROW = count(LICENSE_NUMBER)) ~> aggregateBreedKeys",
+						"aggregateBreedKeys, sourceBreedDimActual join(PRIMARY_BREED == PRIMARY_BREED_NAME",
+						"     && SECONDARY_BREED == SECONDARY_BREED_NAME",
+						"     && SPECIES == SPECIES_NAME,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinToTarget",
+						"joinToTarget filter(isNull(SPECIES_NAME)&&isNull(PRIMARY_BREED_NAME)&&isNull(SECONDARY_BREED_NAME)) ~> filterExistingRows",
+						"filterExistingRows keyGenerate(output(RowNum as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> surrogateKey1",
+						"surrogateKey1 derive(BREED_SK = MAXBREEDSK + RowNum,",
+						"          DI_CREATED_DT = currentTimestamp(),",
+						"          DI_JOB_ID = uuid()) ~> derivedColumns",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     stageInsert: true) ~> sourceBreedDim",
+						"derivedColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     stageInsert: true,",
+						"     mapColumn(",
+						"          BREED_SK,",
+						"          PRIMARY_BREED_NAME = PRIMARY_BREED,",
+						"          SECONDARY_BREED_NAME = SECONDARY_BREED,",
+						"          SPECIES_NAME = SPECIES,",
+						"          DI_LOAD_DT = DI_CREATED_DT",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Dataflow_SeattlePetWorkshop')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -270,7 +538,55 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlow_SeattlePetWorkshop1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DataFlow_LocationDim",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"sourceGeoFile": {},
+									"SinkLocationDim": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlow_LocationDim')]"
+			]
 		}
 	]
 }
