@@ -199,6 +199,53 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DataFlow_SeattlePetWorkshop1",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"sourceStg": {},
+									"BreedDimSource": {},
+									"sourceBreedDim": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DataFlow_SeattlePetWorkshop1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -458,7 +505,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "TEMP_SCHEMA",
-					"table": "DS_V2_PET_LICENSE_STAGE_SNOWFLAKE"
+					"table": "BREED_DIM"
 				}
 			},
 			"dependsOn": [
@@ -648,6 +695,99 @@
 				"[concat(variables('factoryId'), '/datasets/DelimitedText3')]",
 				"[concat(variables('factoryId'), '/datasets/SnowflakeTable3')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlow_SeattlePetWorkshop1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "sourceStg"
+						},
+						{
+							"dataset": {
+								"referenceName": "DelimitedText_DataSet",
+								"type": "DatasetReference"
+							},
+							"name": "BreedDimSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "sourceBreedDim"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          LICENSE_ISSUE_DATE as date,",
+						"          LICENSE_NUMBER as string,",
+						"          ANIMAL_NAME as string,",
+						"          SPECIES as string,",
+						"          PRIMARY_BREED as string,",
+						"          SECONDARY_BREED as string,",
+						"          ZIP_CODE as decimal(38,0),",
+						"          LOAD_DT as date",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'table') ~> sourceStg",
+						"source(output(",
+						"          {License Issue Date} as string,",
+						"          {License Number} as string,",
+						"          {Animal's Name} as string,",
+						"          Species as string,",
+						"          {Primary Breed} as string,",
+						"          {Secondary Breed} as string,",
+						"          {ZIP Code} as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> BreedDimSource",
+						"BreedDimSource derive(DI_CREATED_DT = currentDate()) ~> derivedColumn1",
+						"derivedColumn1 select(mapColumn(",
+						"          PRIMARY_BREED_NAME = {Primary Breed},",
+						"          SECONDARY_BREED_NAME = {Secondary Breed},",
+						"          SPECIES_NAME = Species,",
+						"          DI_LOAD_DT = DI_CREATED_DT",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     stageInsert: true) ~> sourceBreedDim"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SnowflakeTable4')]",
+				"[concat(variables('factoryId'), '/datasets/DelimitedText_DataSet')]"
 			]
 		},
 		{

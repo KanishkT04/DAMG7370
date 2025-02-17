@@ -446,7 +446,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "TEMP_SCHEMA",
-					"table": "DS_V2_PET_LICENSE_STAGE_SNOWFLAKE"
+					"table": "BREED_DIM"
 				}
 			},
 			"dependsOn": [
@@ -513,7 +513,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Dataflow_SeattlePetWorkshop')]",
+			"name": "[concat(parameters('factoryName'), '/DataFlow_SeattlePetWorkshop1')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -522,10 +522,17 @@
 					"sources": [
 						{
 							"dataset": {
+								"referenceName": "SnowflakeTable4",
+								"type": "DatasetReference"
+							},
+							"name": "sourceStg"
+						},
+						{
+							"dataset": {
 								"referenceName": "DelimitedText_DataSet",
 								"type": "DatasetReference"
 							},
-							"name": "source1"
+							"name": "BreedDimSource"
 						}
 					],
 					"sinks": [
@@ -534,18 +541,31 @@
 								"referenceName": "SnowflakeTable4",
 								"type": "DatasetReference"
 							},
-							"name": "sinkSF"
+							"name": "sourceBreedDim"
 						}
 					],
 					"transformations": [
 						{
-							"name": "TranposeColumns"
+							"name": "derivedColumn1"
 						},
 						{
-							"name": "PickRequiredColumns"
+							"name": "select1"
 						}
 					],
 					"scriptLines": [
+						"source(output(",
+						"          LICENSE_ISSUE_DATE as date,",
+						"          LICENSE_NUMBER as string,",
+						"          ANIMAL_NAME as string,",
+						"          SPECIES as string,",
+						"          PRIMARY_BREED as string,",
+						"          SECONDARY_BREED as string,",
+						"          ZIP_CODE as decimal(38,0),",
+						"          LOAD_DT as date",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'table') ~> sourceStg",
 						"source(output(",
 						"          {License Issue Date} as string,",
 						"          {License Number} as string,",
@@ -557,27 +577,17 @@
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> source1",
-						"source1 derive(LIC_ISSUE_DATE = toDate({License Issue Date}, 'MMMM dd yyyy'),",
-						"          Secondary_Breed = iifNull({Secondary Breed}, 'Unknown'),",
-						"          ZIP_Code = lpad(toString({ZIP Code}), 5, '0'),",
-						"          Species = upper(Species),",
-						"          License_Number = toInteger(translate({License Number}, 'S','')),",
-						"          Animal_Name = translate({Animal's Name}, '()', ''),",
-						"          Load_Dt = currentDate()) ~> TranposeColumns",
-						"TranposeColumns select(mapColumn(",
-						"          LICENSE_ISSUE_DATE = LIC_ISSUE_DATE,",
-						"          LICENSE_NUMBER = License_Number,",
-						"          ANIMAL_NAME = Animal_Name,",
-						"          SPECIES = Species,",
-						"          PRIMARY_BREED = {Primary Breed},",
-						"          SECONDARY_BREED = Secondary_Breed,",
-						"          ZIP_CODE = ZIP_Code,",
-						"          LOAD_DT = Load_Dt",
+						"     ignoreNoFilesFound: false) ~> BreedDimSource",
+						"BreedDimSource derive(DI_CREATED_DT = currentDate()) ~> derivedColumn1",
+						"derivedColumn1 select(mapColumn(",
+						"          PRIMARY_BREED_NAME = {Primary Breed},",
+						"          SECONDARY_BREED_NAME = {Secondary Breed},",
+						"          SPECIES_NAME = Species,",
+						"          DI_LOAD_DT = DI_CREATED_DT",
 						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> PickRequiredColumns",
-						"PickRequiredColumns sink(allowSchemaDrift: true,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
@@ -586,13 +596,13 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     stageInsert: true) ~> sinkSF"
+						"     stageInsert: true) ~> sourceBreedDim"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DelimitedText_DataSet')]",
-				"[concat(variables('factoryId'), '/datasets/SnowflakeTable4')]"
+				"[concat(variables('factoryId'), '/datasets/SnowflakeTable4')]",
+				"[concat(variables('factoryId'), '/datasets/DelimitedText_DataSet')]"
 			]
 		}
 	]
