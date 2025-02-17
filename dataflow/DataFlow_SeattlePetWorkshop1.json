@@ -9,15 +9,78 @@
 						"referenceName": "SnowflakeTable4",
 						"type": "DatasetReference"
 					},
-					"name": "source1"
+					"name": "sourceStg"
+				},
+				{
+					"dataset": {
+						"referenceName": "DelimitedText_DataSet",
+						"type": "DatasetReference"
+					},
+					"name": "BreedDimSource"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable4",
+						"type": "DatasetReference"
+					},
+					"name": "sourceBreedDim"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          LICENSE_ISSUE_DATE as date,",
+				"          LICENSE_NUMBER as string,",
+				"          ANIMAL_NAME as string,",
+				"          SPECIES as string,",
+				"          PRIMARY_BREED as string,",
+				"          SECONDARY_BREED as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          LOAD_DT as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     format: 'table') ~> source1"
+				"     format: 'table') ~> sourceStg",
+				"source(output(",
+				"          {License Issue Date} as string,",
+				"          {License Number} as string,",
+				"          {Animal's Name} as string,",
+				"          Species as string,",
+				"          {Primary Breed} as string,",
+				"          {Secondary Breed} as string,",
+				"          {ZIP Code} as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> BreedDimSource",
+				"BreedDimSource derive(DI_CREATED_DT = currentDate()) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          PRIMARY_BREED_NAME = {Primary Breed},",
+				"          SECONDARY_BREED_NAME = {Secondary Breed},",
+				"          SPECIES = Species,",
+				"          DI_CREATED_DT",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true) ~> sourceBreedDim"
 			]
 		}
 	}
