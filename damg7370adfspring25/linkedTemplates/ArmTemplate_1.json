@@ -200,12 +200,12 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "Dataflow_SeattlePetWorkshop",
+								"referenceName": "DataFlow_IndividualPart1",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
 									"source1": {},
-									"sinkSF": {}
+									"sink1": {}
 								}
 							},
 							"staging": {},
@@ -222,9 +222,7 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/Dataflow_SeattlePetWorkshop')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pipeline3')]",
@@ -250,8 +248,9 @@
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
-									"sourceStg": {},
 									"BreedDimSource": {},
+									"sourceStg": {},
+									"BreedDimMaxID": {},
 									"sourceBreedDim": {}
 								}
 							},
