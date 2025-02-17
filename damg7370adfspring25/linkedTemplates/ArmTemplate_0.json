@@ -446,7 +446,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "TEMP_SCHEMA",
-					"table": "arrest_data"
+					"table": "BREED_DIM"
 				}
 			},
 			"dependsOn": [
@@ -591,7 +591,10 @@
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'table') ~> sourceStg",
-						"source(allowSchemaDrift: true,",
+						"source(output(",
+						"          MAXBREEDSK as decimal(10,0)",
+						"     ),",
+						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     query: 'SELECT NVL(MAX(BREED_SK),0) as MaxBreedSK FROM TEMP_SCHEMA.BREED_DIM',",
 						"     format: 'query') ~> BreedDimMaxID",
