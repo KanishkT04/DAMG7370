@@ -10,7 +10,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "TEMP_SCHEMA",
-			"table": "DATE_DIM"
+			"table": "PET_LICENSES_FACT"
 		}
 	}
 }

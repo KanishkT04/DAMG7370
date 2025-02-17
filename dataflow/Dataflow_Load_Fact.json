@@ -1,0 +1,145 @@
+{
+	"name": "Dataflow_Load_Fact",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable4",
+						"type": "DatasetReference"
+					},
+					"name": "sourceStg"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable4",
+						"type": "DatasetReference"
+					},
+					"name": "sourceLocationDim"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable4",
+						"type": "DatasetReference"
+					},
+					"name": "sourceBreedDim"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable4",
+						"type": "DatasetReference"
+					},
+					"name": "sourceDateDim"
+				},
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable4",
+						"type": "DatasetReference"
+					},
+					"name": "FctMaxID"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "joinLocationDim"
+				},
+				{
+					"name": "joinBreedDim"
+				},
+				{
+					"name": "joinDateDim"
+				},
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          LICENSE_ISSUE_DATE as date,",
+				"          LICENSE_NUMBER as string,",
+				"          ANIMAL_NAME as string,",
+				"          SPECIES as string,",
+				"          PRIMARY_BREED as string,",
+				"          SECONDARY_BREED as string,",
+				"          ZIP_CODE as string,",
+				"          LOAD_DT as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceStg",
+				"source(output(",
+				"          SK_ID as decimal(10,0),",
+				"          STATE_FIPS as decimal(10,0),",
+				"          STATE as string,",
+				"          STATE_ABBR as string,",
+				"          ZIPCODE as string,",
+				"          COUNTY as string,",
+				"          CITY as string,",
+				"          DI_CREATED_DT as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceLocationDim",
+				"source(output(",
+				"          BREED_SK as decimal(10,0),",
+				"          SPECIES_NAME as string,",
+				"          PRIMARY_BREED_NAME as string,",
+				"          SECONDARY_BREED_NAME as string,",
+				"          DI_LOAD_DT as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceBreedDim",
+				"source(output(",
+				"          SK_ID as decimal(10,0),",
+				"          FULL_DATE as date,",
+				"          DI_LOAD_DT as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> sourceDateDim",
+				"source(output(",
+				"          PET_LICENSE_SK as decimal(10,0)",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     query: 'SELECT nvl(max(PET_LICENSE_SK),0) AS Pet_License_SK FROM TEMP_SCHEMA.PET_LICENSES_FACT',",
+				"     format: 'query') ~> FctMaxID",
+				"sourceStg, sourceLocationDim join(ZIP_CODE == ZIPCODE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinLocationDim",
+				"joinLocationDim, sourceBreedDim join(PRIMARY_BREED == PRIMARY_BREED_NAME",
+				"     && SECONDARY_BREED == SECONDARY_BREED_NAME",
+				"     && SPECIES == SPECIES_NAME,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinBreedDim",
+				"joinBreedDim, sourceDateDim join(LICENSE_ISSUE_DATE == FULL_DATE,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinDateDim",
+				"aggregate1 keyGenerate(output({undefined} as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"joinDateDim, FctMaxID join(1==1,",
+				"     joinType:'cross',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 aggregate() ~> aggregate1"
+			]
+		}
+	}
+}
