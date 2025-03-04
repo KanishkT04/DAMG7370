@@ -1,0 +1,55 @@
+{
+	"name": "CSV_To_Rows_DF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SnowflakeTable3",
+						"type": "DatasetReference"
+					},
+					"name": "NameBasics"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          LICENSE_ISSUE_DATE as date,",
+				"          LICENSE_NUMBER as string,",
+				"          ANIMAL_NAME as string,",
+				"          SPECIES as string,",
+				"          PRIMARY_BREED as string,",
+				"          SECONDARY_BREED as string,",
+				"          ZIP_CODE as decimal(38,0),",
+				"          LOAD_DT as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table') ~> NameBasics",
+				"NameBasics derive(LICENSE_ISSUE_DATE = LICENSE_ISSUE_DATE) ~> derivedColumn1",
+				"derivedColumn1 foldDown(unroll(),",
+				"     mapColumn(",
+				"          LICENSE_ISSUE_DATE,",
+				"          LICENSE_NUMBER,",
+				"          ANIMAL_NAME,",
+				"          SPECIES,",
+				"          PRIMARY_BREED,",
+				"          SECONDARY_BREED,",
+				"          ZIP_CODE,",
+				"          LOAD_DT",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1"
+			]
+		}
+	}
+}
