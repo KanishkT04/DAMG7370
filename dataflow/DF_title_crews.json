@@ -1,0 +1,92 @@
+{
+	"name": "DF_title_crews",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "title_crews",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "NameBasicsStage",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string (\"10\")",
+				"}",
+				"source(output(",
+				"          tconst as string,",
+				"          directors as string,",
+				"          writers as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(directors = iif(directors == \"\\\\N\", 'unknown', directors),",
+				"          writers = iif(writers == \"\\\\N\", 'unknown', writers)) ~> derivedColumn1",
+				"derivedColumn1 derive(directors = split(directors,','),",
+				"          writers = split(writers,','),",
+				"          job_id = $Job_ID,",
+				"          di_load_date = currentTimestamp()) ~> derivedColumn2",
+				"derivedColumn2 foldDown(unrollMultiple(directors,writers),",
+				"     mapColumn(",
+				"          tconst,",
+				"          directors,",
+				"          writers,",
+				"          job_id,",
+				"          di_job_date = di_load_date",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as decimal(38,0),",
+				"          DEATHYEAR as decimal(38,0),",
+				"          PRIMARYPROFESSION as string,",
+				"          KNOWNFORTITLES as string,",
+				"          DI_JOB_ID as string,",
+				"          LOAD_DATE as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          TCONST = tconst,",
+				"          DIRECTORS = directors,",
+				"          WRITERS = writers,",
+				"          DI_JOB_ID = job_id,",
+				"          LOAD_DATE = di_job_date",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

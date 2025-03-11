@@ -1,0 +1,114 @@
+{
+	"name": "DF_title_basics",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "title_basics",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "NameBasicsStage",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string (\"10\")",
+				"}",
+				"source(output(",
+				"          tconst as string,",
+				"          titleType as string,",
+				"          primaryTitle as string,",
+				"          originalTitle as string,",
+				"          isAdult as string,",
+				"          startYear as string,",
+				"          endYear as string,",
+				"          runtimeMinutes as string,",
+				"          genres as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(genres = split(genres,','),",
+				"          runtimeMinutes = toInteger(runtimeMinutes),",
+				"          isAdult = toInteger(isAdult),",
+				"          endYear = iif(endYear == \"\\\\N\", 'unknown', endYear),",
+				"          startYear = iif(startYear == \"\\\\N\", 'unknown', startYear),",
+				"          originalTitle = iif(originalTitle == \"\\\\N\", 'unknown', originalTitle),",
+				"          primaryTitle = iif(primaryTitle == \"\\\\N\", 'unknown', primaryTitle),",
+				"          titleType = iif(titleType == \"\\\\N\", 'unknown', titleType)) ~> derivedColumn1",
+				"derivedColumn1 foldDown(unroll(genres),",
+				"     mapColumn(",
+				"          tconst,",
+				"          titleType,",
+				"          primaryTitle,",
+				"          originalTitle,",
+				"          isAdult,",
+				"          startYear,",
+				"          endYear,",
+				"          runtimeMinutes,",
+				"          genres",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 derive(runtimeMinutes = iifNull(runtimeMinutes,0),",
+				"          job_id = $Job_ID,",
+				"          di_load_date = currentTimestamp()) ~> derivedColumn2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as decimal(38,0),",
+				"          DEATHYEAR as decimal(38,0),",
+				"          PRIMARYPROFESSION as string,",
+				"          KNOWNFORTITLES as string,",
+				"          DI_JOB_ID as string,",
+				"          LOAD_DATE as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          TCONST = tconst,",
+				"          TITLETYPE = titleType,",
+				"          PRIMARYTITLE = primaryTitle,",
+				"          ORIGINALTITLE = originalTitle,",
+				"          ISADULT = isAdult,",
+				"          STARTYEAR = startYear,",
+				"          ENDYEAR = endYear,",
+				"          RUNTIMEMINUTES = runtimeMinutes,",
+				"          GENRES = genres,",
+				"          DI_JOB_ID = job_id,",
+				"          DI_LOAD_DATE = di_load_date",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

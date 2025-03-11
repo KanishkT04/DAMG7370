@@ -1,0 +1,83 @@
+{
+	"name": "DF_title_episode",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "title_episode",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "NameBasicsStage",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string (\"10\")",
+				"}",
+				"source(output(",
+				"          tconst as string,",
+				"          parentTconst as string,",
+				"          seasonNumber as string,",
+				"          episodeNumber as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(tconst = iif(tconst == \"\\\\N\", 'unknown', tconst),",
+				"          parentTconst = iif(parentTconst == \"\\\\N\", 'unknown', parentTconst),",
+				"          seasonNumber = iif(seasonNumber == \"\\\\N\", '0', seasonNumber),",
+				"          episodeNumber = iif(episodeNumber == \"\\\\N\", '0', episodeNumber)) ~> derivedColumn1",
+				"derivedColumn1 derive(seasonNumber = toInteger(seasonNumber),",
+				"          episodeNumber = toInteger(episodeNumber),",
+				"          job_id = $Job_ID,",
+				"          di_job_date = currentTimestamp()) ~> derivedColumn2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as decimal(38,0),",
+				"          DEATHYEAR as decimal(38,0),",
+				"          PRIMARYPROFESSION as string,",
+				"          KNOWNFORTITLES as string,",
+				"          DI_JOB_ID as string,",
+				"          LOAD_DATE as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          TCONST = tconst,",
+				"          PARENTTCONST = parentTconst,",
+				"          SEASONNUMBER = seasonNumber,",
+				"          EPISODENUMBER = episodeNumber,",
+				"          DI_JOB_ID = job_id,",
+				"          LOAD_DATE = di_job_date",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

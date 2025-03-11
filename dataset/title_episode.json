@@ -1,0 +1,28 @@
+{
+	"name": "title_episode",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1LS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "title.episode.tsv",
+				"fileSystem": "bronze"
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "tconst\tparentTconst\tseasonNumber\tepisodeNumber",
+				"type": "String"
+			}
+		]
+	}
+}

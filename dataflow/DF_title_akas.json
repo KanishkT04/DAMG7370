@@ -1,0 +1,160 @@
+{
+	"name": "DF_title_akas",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "title_akas",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "Country_codes",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "Languages_codes",
+						"type": "DatasetReference"
+					},
+					"name": "source3"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "NameBasicsStage",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string (\"10\")",
+				"}",
+				"source(output(",
+				"          titleId as string,",
+				"          ordering as string,",
+				"          title as string,",
+				"          region as string,",
+				"          language as string,",
+				"          types as string,",
+				"          attributes as string,",
+				"          isOriginalTitle as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source(output(",
+				"          country_code as string,",
+				"          country_name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source2",
+				"source(output(",
+				"          language_code as string,",
+				"          language_name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source3",
+				"source1 derive(title = iif(title == \"\\\\N\", 'unknown', title),",
+				"          region = iif(region == \"\\\\N\", 'unknown', region),",
+				"          language = iif(language == \"\\\\N\", 'unknown', language),",
+				"          types = iif(types == \"\\\\N\", 'unknown', types),",
+				"          attributes = iif(attributes == \"\\\\N\", 'unknown', attributes),",
+				"          ordering = toInteger(ordering),",
+				"          isOriginalTitle = toBoolean(isOriginalTitle),",
+				"          job_id = $Job_ID,",
+				"          di_job_date = currentTimestamp()) ~> derivedColumn1",
+				"source2 derive(country_code = upper(country_code)) ~> derivedColumn2",
+				"derivedColumn1, derivedColumn2 join(region == country_code,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1, source3 join(language == language_code,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 derive(country_name = iifNull(country_name,'unknown'),",
+				"          language_name = iifNull(language_name,'unknown')) ~> derivedColumn3",
+				"derivedColumn3 select(mapColumn(",
+				"          titleId,",
+				"          ordering,",
+				"          title,",
+				"          types,",
+				"          attributes,",
+				"          isOriginalTitle,",
+				"          job_id,",
+				"          di_job_date,",
+				"          country_name,",
+				"          language_name",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as decimal(38,0),",
+				"          DEATHYEAR as decimal(38,0),",
+				"          PRIMARYPROFESSION as string,",
+				"          KNOWNFORTITLES as string,",
+				"          DI_JOB_ID as string,",
+				"          LOAD_DATE as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          TITLEID = titleId,",
+				"          ORDERING = ordering,",
+				"          TITLE = title,",
+				"          REGION = country_name,",
+				"          LANGUAGE = language_name,",
+				"          TYPES = types,",
+				"          ATTRIBUTES = attributes,",
+				"          ISORIGINALTITLE = isOriginalTitle,",
+				"          JOB_ID = job_id,",
+				"          DI_JOB_DATE = di_job_date",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

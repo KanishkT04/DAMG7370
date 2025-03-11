@@ -1,0 +1,105 @@
+{
+	"name": "DF_title_principals",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "title_principals",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "NameBasicsStage",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     Job_ID as string (\"10\")",
+				"}",
+				"source(output(",
+				"          tconst as string,",
+				"          ordering as string,",
+				"          nconst as string,",
+				"          category as string,",
+				"          job as string,",
+				"          characters as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(ordering = iif(ordering == \"\\\\N\", '0', ordering),",
+				"          nconst = iif(nconst == \"\\\\N\", 'unknown', nconst),",
+				"          category = iif(category == \"\\\\N\", 'unknown', category),",
+				"          job = iif(job == \"\\\\N\", 'unknown', job),",
+				"          characters = iif(characters == \"\\\\N\", 'unknown', characters)) ~> derivedColumn1",
+				"derivedColumn1 derive(characters = split(characters,\",\"),",
+				"          job_id = $Job_ID,",
+				"          di_load_date = currentTimestamp(),",
+				"          ordering = toInteger(ordering)) ~> derivedColumn2",
+				"derivedColumn2 foldDown(unroll(characters),",
+				"     mapColumn(",
+				"          tconst,",
+				"          ordering,",
+				"          nconst,",
+				"          category,",
+				"          job,",
+				"          characters,",
+				"          job_id,",
+				"          di_load_date",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as decimal(38,0),",
+				"          DEATHYEAR as decimal(38,0),",
+				"          PRIMARYPROFESSION as string,",
+				"          KNOWNFORTITLES as string,",
+				"          DI_JOB_ID as string,",
+				"          LOAD_DATE as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          TCONST = tconst,",
+				"          ORDERING = ordering,",
+				"          NCONST = nconst,",
+				"          CATEGORY = category,",
+				"          JOB = job,",
+				"          CHARACTERS = characters,",
+				"          DI_JOB_ID = job_id,",
+				"          LOAD_DATE = di_load_date",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

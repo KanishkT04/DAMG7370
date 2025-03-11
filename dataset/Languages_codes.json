@@ -1,0 +1,32 @@
+{
+	"name": "Languages_codes",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1LS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "iso_language_codes.csv",
+				"fileSystem": "bronze"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "language_code",
+				"type": "String"
+			},
+			{
+				"name": "language_name",
+				"type": "String"
+			}
+		]
+	}
+}

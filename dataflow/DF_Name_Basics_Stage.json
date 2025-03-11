@@ -1,0 +1,101 @@
+{
+	"name": "DF_Name_Basics_Stage",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "name_basics",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "NameBasicsStage",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     JOB_ID as string (\"10\")",
+				"}",
+				"source(output(",
+				"          nconst as string,",
+				"          primaryName as string,",
+				"          birthYear as string,",
+				"          deathYear as string,",
+				"          primaryProfession as string,",
+				"          knownForTitles as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(knownForTitles = split(knownForTitles,','),",
+				"          primaryProfession = split(primaryProfession,','),",
+				"          birthYear = iif(birthYear == \"\\\\N\", 'unknown', birthYear),",
+				"          deathYear = iif(deathYear == \"\\\\N\", 'unknown', deathYear),",
+				"          primaryName = iif(primaryName == \"\\\\N\", 'unknown', primaryName),",
+				"          job_id = $JOB_ID,",
+				"          di_job_date = currentTimestamp()) ~> derivedColumn1",
+				"derivedColumn1 foldDown(unrollMultiple(primaryProfession,knownForTitles),",
+				"     mapColumn(",
+				"          nconst,",
+				"          primaryName,",
+				"          birthYear,",
+				"          deathYear,",
+				"          primaryProfession,",
+				"          knownForTitles,",
+				"          job_id,",
+				"          di_job_date",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          NCONST as string,",
+				"          PRIMARYNAME as string,",
+				"          BIRTHYEAR as decimal(38,0),",
+				"          DEATHYEAR as decimal(38,0),",
+				"          PRIMARYPROFESSION as string,",
+				"          KNOWNFORTITLES as string,",
+				"          DI_JOB_ID as string,",
+				"          LOAD_DATE as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     stageInsert: true,",
+				"     mapColumn(",
+				"          NCONST = nconst,",
+				"          PRIMARYNAME = primaryName,",
+				"          BIRTHYEAR = birthYear,",
+				"          DEATHYEAR = deathYear,",
+				"          PRIMARYPROFESSION = primaryProfession,",
+				"          KNOWNFORTITLES = knownForTitles,",
+				"          JOB_ID = job_id,",
+				"          DI_JOB_DATE = di_job_date",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
