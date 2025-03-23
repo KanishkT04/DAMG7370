@@ -1,0 +1,38 @@
+{
+	"name": "title_crewsSnowflake",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "IMDBmidterm",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [
+			{
+				"name": "TCONST",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "DIRECTORS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "WRITERS",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "DI_JOB_ID",
+				"type": "VARCHAR"
+			},
+			{
+				"name": "LOAD_DATE",
+				"type": "TIMESTAMP_LTZ"
+			}
+		],
+		"typeProperties": {
+			"schema": "TEMP_SCHEMA",
+			"table": "TITLE_CREW_STAGE"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "NameBasicsStage",
+						"referenceName": "title_basicsSnowflake",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -78,12 +78,15 @@
 				"derivedColumn2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
-				"          NCONST as string,",
-				"          PRIMARYNAME as string,",
-				"          BIRTHYEAR as decimal(38,0),",
-				"          DEATHYEAR as decimal(38,0),",
-				"          PRIMARYPROFESSION as string,",
-				"          KNOWNFORTITLES as string,",
+				"          TCONST as string,",
+				"          TITLETYPE as string,",
+				"          PRIMARYTITLE as string,",
+				"          ORIGINALTITLE as string,",
+				"          ISADULT as boolean,",
+				"          STARTYEAR as decimal(38,0),",
+				"          ENDYEAR as decimal(38,0),",
+				"          RUNTIMEMINUTES as decimal(38,0),",
+				"          GENRES as string,",
 				"          DI_JOB_ID as string,",
 				"          LOAD_DATE as timestamp",
 				"     ),",

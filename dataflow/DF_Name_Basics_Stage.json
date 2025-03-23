@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "NameBasicsStage",
+						"referenceName": "Name_basicsSnowflake",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -69,12 +69,12 @@
 				"     input(",
 				"          NCONST as string,",
 				"          PRIMARYNAME as string,",
-				"          BIRTHYEAR as decimal(38,0),",
-				"          DEATHYEAR as decimal(38,0),",
+				"          BIRTHYEAR as string,",
+				"          DEATHYEAR as string,",
 				"          PRIMARYPROFESSION as string,",
 				"          KNOWNFORTITLES as string,",
-				"          DI_JOB_ID as string,",
-				"          LOAD_DATE as timestamp",
+				"          JOB_ID as string,",
+				"          DI_JOB_DATE as date",
 				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",

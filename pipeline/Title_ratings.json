@@ -1,5 +1,5 @@
 {
-	"name": "pipeline2",
+	"name": "Title_ratings",
 	"properties": {
 		"activities": [
 			{
@@ -16,8 +16,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DataFlow_IndividualPart1",
-						"type": "DataFlowReference"
+						"referenceName": "DF_title_ratings",
+						"type": "DataFlowReference",
+						"parameters": {
+							"Job_ID": "\"10\""
+						}
 					},
 					"compute": {
 						"coreCount": 8,
@@ -28,7 +31,7 @@
 			}
 		],
 		"annotations": [],
-		"lastPublishTime": "2025-02-17T02:01:11Z"
+		"lastPublishTime": "2025-03-11T22:38:53Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

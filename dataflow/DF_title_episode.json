@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "NameBasicsStage",
+						"referenceName": "title_episodeSnowflake",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -52,16 +52,6 @@
 				"          di_job_date = currentTimestamp()) ~> derivedColumn2",
 				"derivedColumn2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     input(",
-				"          NCONST as string,",
-				"          PRIMARYNAME as string,",
-				"          BIRTHYEAR as decimal(38,0),",
-				"          DEATHYEAR as decimal(38,0),",
-				"          PRIMARYPROFESSION as string,",
-				"          KNOWNFORTITLES as string,",
-				"          DI_JOB_ID as string,",
-				"          LOAD_DATE as timestamp",
-				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",
 				"     updateable:false,",

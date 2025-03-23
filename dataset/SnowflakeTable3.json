@@ -2,7 +2,7 @@
 	"name": "SnowflakeTable3",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Snowflake4",
+			"referenceName": "Snowflake3",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -10,7 +10,8 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "TEMP_SCHEMA",
-			"table": "DS_V2_PET_LICENSE_STAGE_SNOWFLAKE"
+			"table": "ds_V2_PET_LICENSE_STAGE"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
 }

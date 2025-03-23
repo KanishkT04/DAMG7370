@@ -10,7 +10,8 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "TEMP_SCHEMA",
-			"table": "PET_LICENSES_FACT"
+			"table": "DATE_DIM"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
 }

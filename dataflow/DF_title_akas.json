@@ -29,7 +29,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "NameBasicsStage",
+						"referenceName": "title_akasSnowflake",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -125,14 +125,16 @@
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
-				"          NCONST as string,",
-				"          PRIMARYNAME as string,",
-				"          BIRTHYEAR as decimal(38,0),",
-				"          DEATHYEAR as decimal(38,0),",
-				"          PRIMARYPROFESSION as string,",
-				"          KNOWNFORTITLES as string,",
-				"          DI_JOB_ID as string,",
-				"          LOAD_DATE as timestamp",
+				"          TITLEID as string,",
+				"          ORDERING as decimal(38,0),",
+				"          TITLE as string,",
+				"          REGION as string,",
+				"          LANGUAGE as string,",
+				"          TYPES as string,",
+				"          ATTRIBUTES as string,",
+				"          ISORIGINALTITLE as boolean,",
+				"          JOB_ID as string,",
+				"          DI_JOB_DATE as date",
 				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",

@@ -12,5 +12,6 @@
 			"schema": "TEMP_SCHEMA",
 			"table": "ds_V2_PET_LICENSE_STAGE "
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
 }
